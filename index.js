@@ -23,16 +23,22 @@ async function run() {
         // Use agregate to query mubtiple collection and merge data
         app.get('/time-slots', async (req, res) => {
             const date = req.query.date;
-            console.log(date)
             const query = {};
             const options = await appointmentCollection.find(query).toArray();
+
+            // get the booking of the provided date 
             const bookingQuery = { appointmentDate: date }
             const alreadyBooked = await bookingsCollection.find(bookingQuery).toArray();
             // Code Carefully! 
             options.forEach((option) => {
                 const optionBooked = alreadyBooked.filter(book => book.treatment === option.name);
                 const bookedSlots = optionBooked.map(book => book.slot);
-                console.log(date, option.name, bookedSlots)
+
+                // give me slotd which is not in booked! 
+                const remaingSlots = option.slots.filter((slot) => !bookedSlots.includes(slot))
+                option.slots = remaingSlots;
+                console.log(date, option.name, remaingSlots.length)
+
             })
             res.send(options);
         })
