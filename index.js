@@ -37,7 +37,6 @@ async function run() {
                 // give me slotd which is not in booked! 
                 const remaingSlots = option.slots.filter((slot) => !bookedSlots.includes(slot))
                 option.slots = remaingSlots;
-                console.log(date, option.name, remaingSlots.length)
 
             })
             res.send(options);
@@ -55,7 +54,16 @@ async function run() {
         // Post booking data 
         app.post('/bookings', async (req, res) => {
             const booking = req.body;
-            console.log(booking);
+            const query = {
+                appointmentDate: booking.appointmentDate
+            }
+
+            const alreadyHaveAnAppointment = await bookingsCollection.find(query).toArray();
+            if (alreadyHaveAnAppointment) {
+                const message = `You already have a booking on ${booking.appointmentDate}`
+                return res.send({ acknowledged: false, message })
+            }
+
             const result = await bookingsCollection.insertOne(booking);
             res.send(result);
         })
