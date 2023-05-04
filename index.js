@@ -18,11 +18,31 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         const appointmentCollection = client.db('doctors-appointment').collection('time-slots');
+        const bookingsCollection = client.db('doctors-appointment').collection('bookings');
         app.get('/time-slots', async (req, res) => {
             const query = {};
             const options = await appointmentCollection.find(query).toArray();
             res.send(options);
         })
+
+        /*
+        *** API naming conventions 
+        * app.get('/bookings')
+        * app.get('/bookings/:id')
+        * app.post('/bookings')
+        * app.patch('/bookings/:id')
+        * app.delete('/bookings/:id')
+        */
+
+        // Post booking data 
+        app.post('/bookings', async (req, res) => {
+            const booking = req.body;
+            console.log(booking);
+            const result = await bookingsCollection.insertOne(booking);
+            res.send(result);
+        })
+
+
     } finally {
 
     }
