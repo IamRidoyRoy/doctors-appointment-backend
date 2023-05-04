@@ -19,9 +19,21 @@ async function run() {
     try {
         const appointmentCollection = client.db('doctors-appointment').collection('time-slots');
         const bookingsCollection = client.db('doctors-appointment').collection('bookings');
+
+        // Use agregate to query mubtiple collection and merge data
         app.get('/time-slots', async (req, res) => {
+            const date = req.query.date;
+            console.log(date)
             const query = {};
             const options = await appointmentCollection.find(query).toArray();
+            const bookingQuery = { appointmentDate: date }
+            const alreadyBooked = await bookingsCollection.find(bookingQuery).toArray();
+            // Code Carefully! 
+            options.forEach((option) => {
+                const optionBooked = alreadyBooked.filter(book => book.treatment === option.name);
+                const bookedSlots = optionBooked.map(book => book.slot);
+                console.log(date, option.name, bookedSlots)
+            })
             res.send(options);
         })
 
