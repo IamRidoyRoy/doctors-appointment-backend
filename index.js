@@ -55,15 +55,17 @@ async function run() {
         app.post('/bookings', async (req, res) => {
             const booking = req.body;
             const query = {
-                appointmentDate: booking.appointmentDate
-            }
+                appointmentDate: booking.appointmentDate,
+                email: booking.email,
+                treatment: booking.treatment,
 
+            }
+            console.log(query)
             const alreadyHaveAnAppointment = await bookingsCollection.find(query).toArray();
-            if (alreadyHaveAnAppointment) {
+            if (alreadyHaveAnAppointment.length) {
                 const message = `You already have a booking on ${booking.appointmentDate}`
                 return res.send({ acknowledged: false, message })
             }
-
             const result = await bookingsCollection.insertOne(booking);
             res.send(result);
         })
