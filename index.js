@@ -19,6 +19,7 @@ async function run() {
     try {
         const appointmentCollection = client.db('doctors-appointment').collection('time-slots');
         const bookingsCollection = client.db('doctors-appointment').collection('bookings');
+        const usersCollection = client.db('doctors-appointment').collection('users');
 
         // Use agregate to query mubtiple collection and merge data
         app.get('/time-slots', async (req, res) => {
@@ -75,6 +76,14 @@ async function run() {
                 return res.send({ acknowledged: false, message })
             }
             const result = await bookingsCollection.insertOne(booking);
+            res.send(result);
+        })
+
+        // Post user data 
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            console.log(user)
+            const result = await usersCollection.insertOne(user);
             res.send(result);
         })
 
